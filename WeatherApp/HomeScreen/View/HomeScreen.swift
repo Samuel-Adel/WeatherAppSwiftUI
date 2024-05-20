@@ -73,8 +73,6 @@ struct HomeScreen: View {
                     Spacer()
                 }.onAppear{
                     viewModel.checkIfLocatoinServicesIsEnabled()
-                }.task {
-                    viewModel.fetchData(lon: viewModel.region.center.longitude , lat: viewModel.region.center.latitude)
                 }
             }
             

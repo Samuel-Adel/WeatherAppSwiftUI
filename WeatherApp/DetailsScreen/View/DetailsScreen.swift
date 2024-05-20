@@ -15,20 +15,26 @@ struct DetailsScreen: View {
         self.isDayTime = isDayTime
     }
     var body: some View {
+        
         ZStack{
             backgroundImageView(from: forecast.hour[0].time)
-            VStack(spacing: 10) {
-                ForEach(0..<forecast.hour.count) { index in
-                    if isHourNowOrAfter(dateString:forecast.hour[index].time){
-                        DetailsItem(forecastDayHour: forecast.hour[index], isDayTime: isDayTime)
+            ScrollView{
+                VStack(spacing: 10) {
+                    ForEach(0..<forecast.hour.count) { index in
+                        if isHourNowOrAfter(dateString:forecast.hour[index].time){
+                            DetailsItem(forecastDayHour: forecast.hour[index], isDayTime: isDayTime)
+                        }
                     }
+                    Spacer()
+                    Spacer()
                 }
-                Spacer()
-                Spacer()
+                .padding(.top,100)
+                .padding([.leading, .trailing, .bottom], 20)
             }
-            .padding(.top,100)
-            .padding([.leading, .trailing], 20)
+            
         }
+            
+        
         
     }
     func backgroundImageView(from dateString: String) -> Image {

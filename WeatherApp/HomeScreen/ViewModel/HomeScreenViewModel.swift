@@ -8,13 +8,14 @@ import MapKit
 import Foundation
 class HomeScreenViewModel:NSObject,CLLocationManagerDelegate, ObservableObject{
     var locationManager: CLLocationManager?
-    @Published var region:MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 30.135646, longitude: 31.56489643), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
+    @Published var region:MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 0.0, longitude: 0.0), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
     let network: Fetchable
    @Published var weatherModel:WeatherModel = WeatherModel.empty
     init(network: Fetchable) {
         self.network = network
     }
     func fetchData(lon:Double,lat:Double) {
+        print("Fetch func called")
         print(getURl(lon: lon,lat: lat))
         network.fetchWeatherData(urlString: getURl(lon: lon,lat: lat)){
             [weak self]
@@ -36,11 +37,17 @@ class HomeScreenViewModel:NSObject,CLLocationManagerDelegate, ObservableObject{
         if CLLocationManager.locationServicesEnabled(){
             locationManager = CLLocationManager()
             locationManager!.delegate = self
+            checkLocatoinAuth{
+                [weak self]
+                value in
+                self?.fetchData(lon: value.center.longitude, lat: value.center.latitude)
+            }
         }else{
             print("Pls enable your locatoin services")
         }
     }
     func checkLocatoinAuth(completion:@escaping (MKCoordinateRegion)->Void){
+        print("Auth Called")
         guard let locationManager = locationManager else{return}
         switch locationManager.authorizationStatus{
         case .notDetermined:
@@ -51,6 +58,7 @@ class HomeScreenViewModel:NSObject,CLLocationManagerDelegate, ObservableObject{
             print("change it from settings")
         case .authorizedAlways,.authorizedWhenInUse:
             region = MKCoordinateRegion(center: locationManager.location?.coordinate ?? CLLocationCoordinate2D(latitude: 30.135646, longitude: 31.56489643) , span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
+            fetchData(lon: region.center.longitude, lat: region.center.latitude)
         @unknown default:
           break
         }
@@ -62,4 +70,15 @@ class HomeScreenViewModel:NSObject,CLLocationManagerDelegate, ObservableObject{
             self?.fetchData(lon: value.center.longitude, lat: value.center.latitude)
         }
     }
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        checkLocatoinAuth{
+            [weak self]
+            value in
+            self?.fetchData(lon: value.center.longitude, lat: value.center.latitude)
+        }
+    }
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+           print("Failed to get user location: \(error.localizedDescription)")
+       }
+    
 }
