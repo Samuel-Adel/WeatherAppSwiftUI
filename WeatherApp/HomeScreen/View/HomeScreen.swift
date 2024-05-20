@@ -18,6 +18,7 @@ struct HomeScreen: View {
                 backgroundImageView(from: viewModel.weatherModel.current.date)
                 VStack{
                     Spacer()
+                    Spacer()
                     VStack{
                         Text("\(viewModel.weatherModel.location.region)").font(.system(size: 35)).bold().foregroundColor(isDayTime ?.black : .white)
                         Text("\(Int(viewModel.weatherModel.current.tempC))°").font(.system(size: 35)).bold().foregroundColor(isDayTime ?.black : .white)
@@ -37,25 +38,41 @@ struct HomeScreen: View {
                             .padding(.horizontal).foregroundColor(isDayTime ?.black : .white)
                         Spacer()
                     }
-                    
-                    
                     VStack {
                         ForEach(0..<3) { index in
                             NavigationLink(destination: DetailsScreen(forecast: viewModel.weatherModel.forecast.forecastday[index], isDayTime: isDayTime)) {
                                 ForecastDayView(forecastDay: viewModel.weatherModel.forecast.forecastday[index], isDayTime: isDayTime)
                             }
-                        }.padding()
-                    }
-                    
-                    Spacer()
+                        }
+                    }.padding()
+                    HStack{
+                        VStack(alignment: .center) {
+                        Text("Visibility") .font(.system(size: 20)).foregroundColor(isDayTime ?.black : .white).bold()
+                            Text("\(Int(viewModel.weatherModel.current.visKm))KM") .font(.system(size: 20)).foregroundColor(isDayTime ?.black : .white).bold()
+                        }
+                      Spacer()
+                        VStack(alignment: .center) {
+                            Text("Humidity") .font(.system(size: 20)).foregroundColor(isDayTime ?.black : .white).bold()
+                        Text("\(Int(viewModel.weatherModel.current.humidity))%") .font(.system(size: 20)).foregroundColor(isDayTime ?.black : .white).bold()
+                        }
+                    }.padding()
+                    HStack{
+                        VStack(alignment: .center) {
+                        Text("Feels Like") .font(.system(size: 20)).foregroundColor(isDayTime ?.black : .white).bold()
+                            Text("\(Int(viewModel.weatherModel.current.feelslikeC))°") .font(.system(size: 20)).foregroundColor(isDayTime ?.black : .white).bold()
+                            
+                        }
+                      Spacer()
+                        VStack(alignment: .center) {
+                            Text("Pressure") .font(.system(size: 20)).foregroundColor(isDayTime ?.black : .white).bold()
+                        Text("\(Int(viewModel.weatherModel.current.pressureIn))") .font(.system(size: 20)).foregroundColor(isDayTime ?.black : .white).bold()
+                        }
+                    }.padding()
+                  
                     Spacer()
                     Spacer()
                 }.onAppear{
                     viewModel.checkIfLocatoinServicesIsEnabled()
-                    viewModel.locationChangeListener = {
-                       value in
-                        viewModel.fetchData(lon:value.center.longitude , lat: viewModel.region.center.latitude)
-                    }
                 }.task {
                     viewModel.fetchData(lon: viewModel.region.center.longitude , lat: viewModel.region.center.latitude)
                 }

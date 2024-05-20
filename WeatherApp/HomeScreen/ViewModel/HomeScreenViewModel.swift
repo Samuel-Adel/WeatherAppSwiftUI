@@ -9,7 +9,6 @@ import Foundation
 class HomeScreenViewModel:NSObject,CLLocationManagerDelegate, ObservableObject{
     var locationManager: CLLocationManager?
     @Published var region:MKCoordinateRegion = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 30.135646, longitude: 31.56489643), span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1))
-    var locationChangeListener: (MKCoordinateRegion) -> () = {value in }
     let network: Fetchable
    @Published var weatherModel:WeatherModel = WeatherModel.empty
     init(network: Fetchable) {
@@ -58,8 +57,9 @@ class HomeScreenViewModel:NSObject,CLLocationManagerDelegate, ObservableObject{
     }
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         checkLocatoinAuth{
+            [weak self]
             value in
-            self.locationChangeListener(value)
+            self?.fetchData(lon: value.center.longitude, lat: value.center.latitude)
         }
     }
 }
