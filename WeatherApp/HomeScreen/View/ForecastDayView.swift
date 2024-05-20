@@ -30,7 +30,7 @@ struct ForecastDayView: View {
             Spacer()
             Text("\(Int(forecastDay.day.minTempCelvin))° - \(Int(forecastDay.day.maxTempCelvin))°").foregroundColor(isDayTime ?.black : .white).bold()
                      Spacer()
-               }
+        }
     }
     func getDayName( dateString: String) -> String {
         let dateFormatter = DateFormatter()
